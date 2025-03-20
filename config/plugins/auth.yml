@@ -1,0 +1,25 @@
+_format_version: "2.1"
+_transform: true
+
+plugins:
+  - name: jwt
+    enabled: true
+    config:
+      secret_is_base64: false
+      claims_to_verify:
+        - exp
+      key_claim_name: kid
+      uri_param_names:
+        - jwt
+      cookie_names: []
+      header_names:
+        - Authorization
+      # À remplacer par l'URL réelle de l'Auth0 JWKS
+      jwks_uri: https://YOUR_AUTH0_DOMAIN/.well-known/jwks.json
+
+consumers:
+  - username: frontend-client
+    custom_id: frontend-app
+    jwt_secrets:
+      - key: frontend-app
+        algorithm: RS256 

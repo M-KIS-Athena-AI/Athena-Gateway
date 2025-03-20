@@ -1,0 +1,18 @@
+_format_version: "2.1"
+_transform: true
+
+plugins:
+  - name: rate-limiting
+    enabled: true
+    config:
+      minute: 60              # Limite par minute par défaut
+      hour: 1000              # Limite par heure par défaut
+      policy: local           # Peut être 'local', 'cluster', 'redis'
+      limit_by: ip            # Peut être 'ip', 'credential', 'header', 'service', 'path'
+      fault_tolerant: true
+      hide_client_headers: false
+      redis_host: null        # À configurer si policy='redis'
+      redis_port: 6379
+      redis_password: null
+      redis_timeout: 2000
+      redis_database: 0 

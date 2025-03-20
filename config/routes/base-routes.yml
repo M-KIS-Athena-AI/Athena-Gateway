@@ -1,0 +1,107 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  # Service d'authentification
+  - name: auth-service
+    url: http://auth-service:3000
+    routes:
+      - name: auth-routes
+        paths:
+          - /api/auth
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Service IA/Chat
+  - name: ai-service
+    url: http://ai-service:5000
+    routes:
+      - name: chat-routes
+        paths:
+          - /api/chat
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Service d'intégration AWS
+  - name: aws-integration-service
+    url: http://aws-integration-service:4000
+    routes:
+      - name: aws-integration-routes
+        paths:
+          - /api/integrations/aws
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Service d'intégration Datadog
+  - name: datadog-integration-service
+    url: http://datadog-integration-service:4001
+    routes:
+      - name: datadog-integration-routes
+        paths:
+          - /api/integrations/datadog
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Service d'intégration OVH
+  - name: ovh-integration-service
+    url: http://ovh-integration-service:4002
+    routes:
+      - name: ovh-integration-routes
+        paths:
+          - /api/integrations/ovh
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Service de stockage
+  - name: storage-service
+    url: http://storage-service:6000
+    routes:
+      - name: data-routes
+        paths:
+          - /api/data
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Route pour la documentation des API
+  - name: docs-service
+    url: http://docs-service:8080
+    routes:
+      - name: docs-routes
+        paths:
+          - /api/docs
+        strip_path: true
+        preserve_host: false
+        protocols:
+          - http
+          - https
+
+  # Route pour vérifier la santé du système
+  - name: health-service
+    url: http://health-service:8081
+    routes:
+      - name: health-routes
+        paths:
+          - /api/health
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - http
+          - https 

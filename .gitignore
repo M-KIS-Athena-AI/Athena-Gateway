@@ -1,0 +1,32 @@
+# Environment variables
+.env
+
+# Docker volumes and data
+kong/data/
+data/
+*.rdb
+
+# Logs
+*.log
+logs/
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Dependencies
+node_modules/
+vendor/ 

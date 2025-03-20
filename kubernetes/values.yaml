@@ -1,0 +1,86 @@
+# Kong Helm Chart configuration values
+
+# Database configuration
+postgresql:
+  enabled: true
+  auth:
+    username: kong
+    password: kong_password
+    database: kong
+  primary:
+    persistence:
+      size: 10Gi
+
+# Kong configuration
+kong:
+  env:
+    database: postgres
+    log_level: info
+  ingressController:
+    enabled: true
+    installCRDs: false
+  proxy:
+    enabled: true
+    tls:
+      enabled: true
+      http2: true
+      certificateConfig:
+        secretName: kong-tls
+    ingress:
+      enabled: true
+      hostname: api.athena.example.com
+      tls: true
+  admin:
+    enabled: true
+    http:
+      enabled: true
+    tls:
+      enabled: true
+    ingress:
+      enabled: true
+      hostname: kong-admin.internal.athena.example.com
+      tls: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        # Restreindre l'accès à l'Admin API
+        nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+# Plugins configuration  
+plugins:
+  configMaps:
+  - name: kong-plugin-configs
+    pluginConfigs:
+    - name: rate-limiting
+      config:
+        minute: 60
+        hour: 1000
+        policy: local
+    - name: cors
+      config:
+        origins:
+        - https://app.athena.example.com
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+        headers:
+        - Content-Type
+        - Authorization
+        credentials: true
+        preflight_continue: false
+        max_age: 3600
+    - name: prometheus
+      config: {}
+    - name: request-termination
+      config:
+        status_code: 404
+        message: "Route not found" 
