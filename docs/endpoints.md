@@ -104,4 +104,147 @@ Des limites spécifiques par service:
 
 ## CORS
 
-CORS est activé pour l'origine `https://app.athena.example.com`. 
+CORS est activé pour l'origine `https://app.athena.example.com`.
+
+## Test Service (httpbin.org)
+
+Base URL: `http://localhost:8000/test`
+
+### GET /test/get
+
+Test endpoint that returns the request details.
+
+**Headers:**
+- `Origin` (optional): For CORS testing
+- Other standard HTTP headers are supported
+
+**Response:**
+```json
+{
+  "args": {},
+  "headers": {
+    // Request headers
+  },
+  "origin": "client-ip",
+  "url": "http://localhost/get"
+}
+```
+
+**Rate Limiting:**
+- 5 requests per minute
+- Headers:
+  - `X-RateLimit-Remaining-Minute`: Remaining requests
+  - `X-RateLimit-Limit-Minute`: Request limit
+  - `RateLimit-Reset`: Seconds until limit reset
+
+**CORS:**
+- Allowed Origins: `*`
+- Allowed Methods: GET, POST, PUT, DELETE, OPTIONS
+- Allowed Headers:
+  - Accept
+  - Accept-Version
+  - Content-Length
+  - Content-MD5
+  - Content-Type
+  - Date
+  - X-Auth-Token
+- Exposed Headers: X-Auth-Token
+- Credentials: Allowed
+- Max Age: 3600 seconds
+
+## Admin API
+
+Base URL: `http://localhost:8001`
+
+### GET /status
+
+Get the status of the Kong Gateway.
+
+### GET /metrics
+
+Get Prometheus metrics (when plugin is enabled).
+
+### GET /plugins
+
+List all configured plugins.
+
+## Plugin Configuration
+
+### Rate Limiting Plugin
+
+**Configuration:**
+```yaml
+name: rate-limiting
+config:
+  minute: 5
+  policy: local
+  fault_tolerant: true
+  hide_client_headers: false
+```
+
+### CORS Plugin
+
+**Configuration:**
+```yaml
+name: cors
+config:
+  origins:
+    - "*"
+  methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  headers:
+    - Accept
+    - Accept-Version
+    - Content-Length
+    - Content-MD5
+    - Content-Type
+    - Date
+    - X-Auth-Token
+  exposed_headers:
+    - X-Auth-Token
+  credentials: true
+  max_age: 3600
+  preflight_continue: false
+```
+
+### Prometheus Plugin
+
+**Configuration:**
+```yaml
+name: prometheus
+config:
+  per_consumer: true
+```
+
+## Error Responses
+
+### Rate Limit Exceeded (429)
+```json
+{
+  "message": "API rate limit exceeded"
+}
+```
+
+## Testing Examples
+
+### Basic Request
+```bash
+curl http://localhost:8000/test/get
+```
+
+### CORS Request
+```bash
+curl -i -H "Origin: http://example.com" http://localhost:8000/test/get
+```
+
+### Rate Limit Test
+```bash
+for i in {1..6}; do
+  curl -i http://localhost:8000/test/get
+  sleep 1
+done
+``` 

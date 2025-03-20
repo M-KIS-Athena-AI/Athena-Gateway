@@ -1,94 +1,125 @@
 # Athena Gateway
 
-Ce projet implémente une Gateway API basée sur Kong pour l'organisation M-KIS-Athena-AI.
+API Gateway implementation based on Kong for the M-KIS-Athena-AI organization.
 
-## État Actuel du Projet
+## Current Status
 
-### ✅ Infrastructure de Base
-- Kong Gateway opérationnel (version 3.5.0)
-- PostgreSQL comme datastore
-- Service de test configuré (httpbin.org)
-- Route de test configurée (/test)
+The gateway is operational with the following features:
 
-### ✅ Plugins Configurés
-- Rate Limiting (5 requêtes par minute)
-- Prometheus metrics (monitoring)
-- CORS (en cours de configuration)
+- Basic infrastructure with Kong and PostgreSQL
+- Test service configured (example_service pointing to httpbin.org)
+- Configured plugins:
+  - Rate Limiting (5 requests per minute)
+  - CORS (configured for cross-origin requests)
+  - Prometheus metrics (enabled for monitoring)
 
-## Configuration Locale
+## Prerequisites
 
-### Prérequis
-- Docker Desktop
-- curl (pour les tests API)
+- Docker and Docker Compose
+- curl (for testing)
+- jq (for JSON processing)
 
-### Installation
+## Installation
 
-1. Cloner le repository :
+1. Clone the repository:
 ```bash
-git clone git@github.com:M-KIS-Athena-AI/Athena-Gateway.git
-cd Athena-Gateway
+git clone https://github.com/athena-ai/athena-gateway.git
+cd athena-gateway
 ```
 
-2. Démarrer les services :
+2. Create a `.env` file with the required environment variables (see `.env.example`)
+
+3. Start the services:
 ```bash
-cd kong
-docker compose up -d
+docker-compose up -d
 ```
 
-3. Vérifier l'installation :
-```bash
-curl http://localhost:8001/status
-```
+## Configuration
 
-### Ports Exposés
-- 8000 : Kong Proxy (HTTP)
-- 8443 : Kong Proxy (HTTPS)
-- 8001 : Kong Admin API (localhost uniquement)
-- 5432 : PostgreSQL (localhost uniquement)
+### Exposed Ports
 
-### Configuration Actuelle
+- Kong Admin API: 8001
+- Kong Proxy: 8000
+- PostgreSQL: 5432
 
-#### Services et Routes
-```bash
-# Test service (httpbin)
-curl http://localhost:8000/test/get
-```
+### Current Routes
+
+- `/test/*` - Routes to httpbin.org (example service)
+
+### Plugin Configuration
 
 #### Rate Limiting
-- Limite : 5 requêtes par minute
-- Headers : X-RateLimit-Remaining-Minute, X-RateLimit-Limit-Minute
-- Politique : local
+- 5 requests per minute
+- Local policy (no Redis required)
+- Returns 429 status code when exceeded
 
-#### Prometheus Metrics
-- Endpoint : http://localhost:8001/metrics
-- Configuration : per_consumer=true
+#### CORS
+- Allows all origins (`*`)
+- Supports common HTTP methods (GET, POST, PUT, DELETE, OPTIONS)
+- Allows credentials
+- 1-hour max age for preflight requests
 
-## Prochaines Étapes
+#### Prometheus
+- Enabled for basic metrics
+- Per-consumer tracking enabled
 
-### 🔄 En Cours
-- Configuration CORS
-- Documentation des endpoints
+## Testing
 
-### 📅 À Venir
-- Configuration SSL/TLS
-- Mise en place de l'authentification
-- Configuration déclarative (kong.yml)
-- Dashboards de monitoring
+Test the API Gateway functionality:
 
-## Structure du Projet
+```bash
+# Test the example service
+curl http://localhost:8000/test/get
+
+# Test rate limiting
+for i in {1..6}; do curl -i http://localhost:8000/test/get; sleep 1; done
+
+# Test CORS
+curl -i -H "Origin: http://example.com" http://localhost:8000/test/get
 ```
-Athena-Gateway/
-├── kong/
-│   ├── docker-compose.yml
-│   ├── .env
-│   ├── config/           # Configuration Kong
-│   └── data/            # Données persistantes
-├── docs/                # Documentation
+
+## Next Steps
+
+- [ ] Configure authentication
+- [ ] Set up SSL/TLS certificates
+- [ ] Create declarative configuration
+- [ ] Set up monitoring dashboards
+- [ ] Document all endpoints
+- [ ] Configure additional security plugins
+
+## Project Structure
+
+```
+.
+├── config/
+│   ├── kong.yml
+│   └── plugins/
+│       ├── auth.yml
+│       ├── cors.yml
+│       ├── prometheus.yml
+│       ├── rate-limiting.yml
+│       └── request-termination.yml
+├── docker/
+│   └── docker-compose.yml
+├── docs/
+│   └── endpoints.md
+├── kubernetes/
+│   └── values.yaml
+├── scripts/
+│   ├── setup-kong.sh
+│   └── test-routes.sh
+├── .env
+├── .gitignore
+├── docker-compose.yml
 └── README.md
 ```
 
-## Contribution
-Instructions pour contribuer au projet à venir...
+## Contributing
 
-## Licence
-À définir...
+1. Create a feature branch
+2. Make your changes
+3. Submit a pull request
+
+## License
+
+[Add appropriate license]
